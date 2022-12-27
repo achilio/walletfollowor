@@ -4,7 +4,7 @@
 
 ```bash
 git clone https://github.com/achilio/walletfollowor.git
-cd walletfollowor
+cd walletfollowor/component
 yarn install
 ```
 
