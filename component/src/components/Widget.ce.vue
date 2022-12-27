@@ -27,6 +27,8 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import moment from "moment";
+import { useFollowator } from "../composables/followator";
+
 const props = defineProps({
   address: {
     type: String,
@@ -45,6 +47,11 @@ const props = defineProps({
   },
 });
 
+const { client } = useFollowator(props.address);
+client.onTransaction((tx: Transaction) => {
+  transactions.value.push(tx);
+});
+
 interface Transaction {
   id: string;
   from: string;
@@ -59,7 +66,7 @@ const computedTransactions = computed(() => {
     return {
       ...tx,
       fmtId: tx.id.substring(0, 6) + "-" +  tx.id.substring(tx.id.length - 6, tx.id.length),
-      fmtDate: moment(tx.date).format("HH:mm"),
+      fmtDate: moment(tx.date).format("HH:mm:ss"),
       value: tx.value.toFixed(5),
     };
   }).reverse();
@@ -70,37 +77,7 @@ const openTransaction = (id: string) => {
   window.open(`https://www.blockchain.com/explorer/transactions/btc/${id}`, "_blank");
 };
 
-const generateRandomEthereumTransaction = () => {
-  const randomFrom =
-    Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15);
-  const randomTo =
-    Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15);
-  const randomTransaction = {
-    from: randomFrom,
-    to: randomTo,
-    value: Math.random() * 20,
-    date: new Date(),
-    id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
-  }; 
-  // remove first element if array is longer than 10
-  transactions.value.length >= 10 && transactions.value.shift();
-  transactions.value.push(randomTransaction);
-};
 
-// Generate random transactions
-const generateRandomTransactions = () => {
-  for (let i = 0; i < 10; i++) {
-    generateRandomEthereumTransaction();
-  }
-};
-// Initialize with random transactions
-generateRandomTransactions();
-// Generate new random transactions every second
-setInterval(() => {
-  generateRandomEthereumTransaction();
-}, 1000);
 </script>
 
 <style>
