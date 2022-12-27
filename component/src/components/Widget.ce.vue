@@ -49,7 +49,9 @@ const props = defineProps({
 
 const { client } = useFollowator(props.address);
 client.onTransaction((tx: Transaction) => {
-  transactions.value.push(tx);
+  const allTx = transactions.value;
+  allTx.length >= 10 && allTx.pop();
+  allTx.push(tx);
 });
 
 interface Transaction {
